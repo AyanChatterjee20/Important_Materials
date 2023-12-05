@@ -21,6 +21,62 @@ data = [(1, "John", 30, "Sales", 50000.0),
 
 df = spark.createDataFrame(data, schema=['id' , 'name' , 'age' , 'department' , 'salary' ])
 
-
+--------------------------------------------------------------------------------------
 Calculate the average salary for each department
+
+avg_df=df.groupBy(col("department")).agg(avg("salary").alias("avg_salary"))
+-------------------------------------------------------------------------------------
+Add a new column named "bonus" that is 10% of the salary for all
+
+df=df.selectExpr("*", "0.1*salary as bonus")
+----------------------------------------------------------------------------------------
+Group the data by department and find the employee with
+the highest salary in each department
+
+from pyspark.sql.window import Window
+
+w= Window.partitionBy(col("department")).orderBy(col("salary").desc())
+df_w=df.withColumn("rank",rank().over(w))
+df_w.filter(col("rank")==1).show()
+-----------------------------------------------------------------------------------------------
+Find the top 2 departments with the highest total salary.
+
+df_d=df.groupBy(col("department")).agg(sum(col("salary")).alias("sum_sal_dept")).orderBy(desc(col("sum_sal_dept"))).limit(2)
+df_d.show()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
