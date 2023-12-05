@@ -1,0 +1,26 @@
+cMap = {"k1" : "v1", "k2" : "v1", "k3" : "v2", "k4" : "v2"}
+a_cMap = [(k,)+(v,) for k,v in cMap.items()] 
+data = spark.createDataFrame(a_cMap, ['key','val'])
+data.show()
+from pyspark.sql.functions import count
+data = data.groupBy('key').pivot('val').agg(count('val'))
+data.show()
+data = data.na.fill(0)
+data.show()
+-----------------------------------------------------------------------------------------
+from pyspark.sql import Row
+from pyspark.sql.types import StructType, StructField, IntegerType, StringType, DoubleType
+from pyspark.sql.functions import *
+
+data = [(1, "John", 30, "Sales", 50000.0),
+(2, "Alice", 28, "Marketing", 60000.0),
+(3, "Bob", 32, "Finance", 55000.0),
+(4, "Sarah", 29, "Sales", 52000.0),
+(5, "Mike", 31, "Finance", 58000.0)
+]
+
+df = spark.createDataFrame(data, schema=['id' , 'name' , 'age' , 'department' , 'salary' ])
+
+
+Calculate the average salary for each department
+
