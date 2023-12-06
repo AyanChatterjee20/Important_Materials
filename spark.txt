@@ -56,28 +56,42 @@ df_a=df.withColumn("avg_dept_sal",avg(col("salary")).over(w))
 df_a=df_a.withColumn("diff_avg_sal",abs(col("avg_dept_sal")-col("salary")))
 df_a.show()
 --------------------------------------------------------------------------------------------------
+Calculate the sum of salaries for employees whose names start with the letter "J".
 
+df_j=df.filter(col("name").like("J%")).agg(sum(col("salary")).alias("total_sal"))
+df_j.show()
+-----------------------------------------------------------------------------------------------------------
+Sort the DataFrame based on the "age" column in ascending order and then by "salary" column in descending order
 
+df= df.orderBy(col("age"), desc(col("salary")))
+df.show()
+----------------------------------------------------------------------------------------------------------
+Replace the department name "Finance" with "Financial Services" in the DataFrame:
 
+df=df.withColumn("department",when(col("department")==lit("Finance"),lit("Financial Services")).otherwise(col("department")))
+df.show()
+-----------------------------------------------------------------------------
+Calculate the percentage of total salary each employee contributes to their respective department.
 
+w=Window.partitionBy(col("department"))
+df=df.withColumn("per_sal",sum(col("salary")).over(w)).withColumn("per_sal",round((col("salary")/col("per_sal"))*100,2))
+df.show()
+----------------------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------------------
+calculate the month-wise cumulative revenue
 
+data = [(3000, '22-may'),
+(5000, '23-may'),
+(5000, '25-may'),
+(10000, '22-june'),
+(12500, '03-july')
+]
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+df = spark.createDataFrame(data, schema=['revenue','date'])
+df=df.withColumn("month",split(col("date"),'-')[1]).withColumn("date",date_format(to_date(col("date"),'dd-MMMM'),'dd-MM'))
+w=Window.partitionBy(col("month")).orderBy(col("date"))
+df=df.withColumn("cum_sum",sum(col("revenue")).over(w))
+df.show()
 
 
 
