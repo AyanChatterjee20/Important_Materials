@@ -92,10 +92,37 @@ df=df.withColumn("month",split(col("date"),'-')[1]).withColumn("date",date_forma
 w=Window.partitionBy(col("month")).orderBy(col("date"))
 df=df.withColumn("cum_sum",sum(col("revenue")).over(w))
 df.show()
+---------------------------------------------------------------------------------------------------------
+word count
 
+data=[['I am parcticing Spark'], ['I am going to change company']]
+df=spark.createDataFrame(data,['sen'])
+df=df.withColumn("words",explode(split(col("sen"),' ')))
+df=df.groupBy(col("words")).agg(count(col("words")).alias("word_count"))
+df.show()
+----------------------------------------------------------------------------------------------------------
+Given a DataFrame containing product information with amounts and countries, the task is to create a concise summary table where each row represents a unique product, and the columns show the amounts associated with that product in different countries. If a product is not available in a specific country, the value in that cell should be null.
 
+Problem:
+------------------------------------------------------
+| Product | Amount | Country |
+|---------|--------|---------|
+| Banana | 1000  | USA   |
+| Carrots | 1500  | USA   |
+| Banana | 400  | China  |
 
+Output:
+--------------------------------
+| product | China | USA  |
+|---------|-------|--------|
+| Banana | 400  | 1000  |
+| Carrots | null | 1500  |
 
+data=[['Banana',1000,'USA'],['Carrots',1500,'USA'],['Banana',400,'China']]
+df=spark.createDataFrame(data,['product','amount','country'])
+
+df=df.groupBy(col("product")).pivot("country").agg(sum(col("amount")))
+df.show()
 
 
 
