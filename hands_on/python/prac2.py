@@ -1,5 +1,6 @@
 # palindrome number and prime number check
 import math as m
+import sys
 
 
 def palindrome_check(val):
@@ -12,15 +13,18 @@ def palindrome_check(val):
 
 
 def prime_check(val):
-    pass
+    for i in range(2, m.floor(val / 2)):
+        if val % i == 0:
+            print("Given number is not prime.")
+            sys.exit(0)
+    print("Given number is prime.")
 
 
 def main():
     try:
         val = int(input("Enter the number :"))
         palindrome_check(val)
-        pri = prime_check(val)
-        print(f"Nearest palindrome number of given number : ")
+        prime_check(val)
     except Exception as e:
         print(e)
 
