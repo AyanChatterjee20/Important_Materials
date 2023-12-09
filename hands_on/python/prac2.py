@@ -1,4 +1,4 @@
-# palindrome number and prime number check
+# palindrome number and prime number check in that interval
 import math as m
 import sys
 
@@ -13,11 +13,14 @@ def palindrome_check(val):
 
 
 def prime_check(val):
-    for i in range(2, m.floor(val / 2)):
-        if val % i == 0:
-            print("Given number is not prime.")
-            sys.exit(0)
-    print("Given number is prime.")
+    l = []
+    for val1 in range(2, val + 1):
+        for i in range(2, m.floor(val1 / 2)):
+            if val1 % i == 0:
+                break
+        else:
+            l.append(val1)
+    print(f"List of prime numbers in the given interval : {l}")
 
 
 def main():
