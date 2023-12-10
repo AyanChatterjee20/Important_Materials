@@ -1,31 +1,31 @@
-# check array monotonic increasing or decreasing
+# Sort given array and sum all the numbers of an array
+# Find nth largest element of a given array
 import sys
+from functools import reduce
 
 
-def monotonic(l):
-    tmp = l[0]
-    flag = 0
-    for i in range(1, len(l)):
-        if l[i] >= tmp:
-            tmp = l[i]
-            flag = 1
-        elif l[i] < tmp:
-            flag = 0
-            break
-    if flag == 1:
-        print(f"Given list is monotonically increasing : {l}")
-        sys.exit(0)
-    for i in range(1, len(l)):
-        if l[i] <= tmp:
-            tmp = l[i]
-            flag = 1
-        elif l[i] > tmp:
-            flag = 0
-            break
-    if flag == 1:
-        print(f"Given list is monotonically decreasing : {l}")
-        sys.exit(0)
-    print(f"Given list is not monotonically : {l}")
+def nth_largest(l):
+    n = int(input("Enter the nth value to find the largets in the given array: "))
+    l.sort()
+    v = l[-n]
+    print(f"Sorted array is {l} and the nth highest is {v}")
+
+
+def _sum(l):
+    val = reduce(lambda a, b: a + b, l)
+    print(f"Sum of the numbers of array is : {val}")
+
+
+def _sort(l):
+    val = len(l)
+    for i in range(val):
+        if l[i] > 0:
+            l.append(l[i])
+            l[i] = ''
+        else:
+            pass
+    l = [i for i in l if i != '']
+    print(f"Left side negative numbers and right side positive numbers : {l}")
 
 
 def main():
@@ -35,7 +35,9 @@ def main():
         for i in range(val):
             tmp = int(input("Enter the value: "))
             l.append(tmp)
-        monotonic(l)
+        nth_largest(l)
+        _sum(l)
+        _sort(l)
     except Exception as e:
         print(e)
 
