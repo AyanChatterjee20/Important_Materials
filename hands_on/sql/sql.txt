@@ -1,1 +1,112 @@
-Practice
+You are given a table of users who have been blocked from Facebook, together with the date, duration, and the reason for the blocking. The duration is expressed as the number of days after blocking date and if this field is empty, this means that a user is blocked permanently. For each blocking reason, count how many users were blocked in December 2021. Include both the users who were blocked in December 2021 and those who were blocked before but remained blocked for at least a part of December 2021.
+
+CREATE TABLE fb_blocked_users (
+user_id int,
+block_reason varchar(50),
+block_date datetime,
+block_duration float
+);
+
+INSERT INTO fb_blocked_users VALUES
+(3642,'Fake Account','2021-12-03',15),
+(2847,'Fake Account','2021-12-15',120),
+(1239,'Fake Account','2021-11-19',11),
+(3642,'Fake Account','2021-12-23',15),
+(2134,'Fake Account','2021-11-03',null),
+(1309,'Fake Account','2021-11-29',14),
+(2049,'Spreading Fakenews','2022-01-12',null),
+(1382,'Spreading Fakenews','2021-12-31',2),
+(4295,'Spreading Fakenews','2020-12-14',null),
+(3598,'Spreading Fakenews','2021-10-15',90),
+(9285,'Inappropriate Posts','2021-12-01',null),
+(4833,'Inappropriate Posts','2021-07-14',30),
+(2348,'Inappropriate Posts','2020-11-25',15),
+(1387,'Inappropriate Posts','2021-12-26',25);
+
+select block_reason, count(user_id) from fb_blocked_users where month(block_date)=12 or month(date_add(block_date,interval block_duration day))=12 group by block_reason;
+
+----------------------------------------------------------------------------------------------------------------------------------------------
+Write a query to calculate the distribution of comments by the count of users that joined Meta/Facebook between 2018 and 2020, for the month of January 2020. The output should contain a count of comments and the corresponding number of users that made that number of comments in Jan-2020. For example, you'll be counting how many users made 1 comment, 2 comments, 3 comments, 4 comments, etc in Jan-2020. Your left column in the output will be the number of comments while your right column in the output will be the number of users. Sort the output from the least number of comments to highest. To add some complexity, there might be a bug where an user post is dated before the user join date. You'll want to remove these posts from the result.
+
+create table fb_users (
+id int,
+name varchar(100),
+joined_at datetime,
+city_id int,
+device int);
+
+create table fb_comments (
+user_id int,
+body varchar(1000),
+created_at datetime);
+
+Insert into fb_users values
+(4,'Ashley Sparks','2020-06-30',63,2185),
+(8,'Zachary Tucker','2018-02-18',78,3900),
+(9,'Caitlin Carpenter','2020-07-23',60,8592),
+(18,'Wanda Ramirez','2018-09-28',55,7904),
+(21,'Tonya Johnson','2019-12-02',62,4816),
+(24,'Carlos Newman','2020-02-06',74,861),
+(25,'Natasha Bradford','2020-02-12',60,9401),
+(27,'Jessica Farrell','2019-03-24',67,7190),
+(32,'Catherine Hurst','2018-08-22',51,5529),
+(33,'Amanda Leon','2017-10-06',77,4597);
+
+insert into fb_comments values 
+(89,'Wrong set challenge guess college as position.','2020-01-16'),
+(33,'Interest always door health military bag. Store smile factor player goal detail TV loss.','2019-12-31'),
+(34,'Physical along born key leader various. Forward box soldier join.','2020-01-08'),
+(46,'Kid must energy south behind hold. Research common long state get at issue. Weight technology live plant. His size approach loss.','2019-12-29'),
+(25,'Or matter will turn only woman fact.','2019-12-21'),
+(8,'Western east tax group character establish professor. Forward growth material. Before garden military product. Over southern manager. Along series civil theory force language clear.','2020-01-13');
+
+with cmt_cte as (
+select u.id, count(1) no_of_comment from fb_users u inner join fb_comments c on u.id=c.user_id 
+where YEAR(u.joined_at) between 2018 and 2020 and date_format(cast(c.created_at as date), '%m-%Y') = '01-2020' and u.joined_at <= c.created_at
+group by u.id
+);
+
+select no_of_comment, count(id) no_of_users from cmt_cte group by no_of_comment order by no_of_users
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------
+An event is logged in the events table with a timestamp each time a new rider attempts a signup (with an event name 'attempted_su') or successfully signs up (with an event name of 'su_success'). For each city and date, determine the percentage of signups in the first 7 days of 2022 that completed a trip within 168 hours of the signup date. HINT: driver id column corresponds to rider id column
+
+create table signup_events (
+rider_id varchar(100),
+city_id varchar(100),
+event_name varchar(100),
+timestamp datetime);
+
+create table trip_details(
+id varchar(100),
+client_id varchar(100),
+driver_id varchar(100),
+city_id varchar(100),
+client_rating float,
+driver_rating float,
+request_at datetime,
+predicted_eta datetime,
+actual_time_of_arrival datetime,
+status varchar(100));
+
+insert into signup_events values 
+('r01','c001','su_success','2022-01-01 07:00:00'),
+('r02','c002','su_success','2022-01-01 08:00:00'),
+('r03','c002','su_success','2022-01-01 08:00:00'),
+('r04','c001','attempted_su','2022-01-02 08:00:00'),
+('r06','c001','attempted_su','2022-01-02 08:00:00'),
+('r04','c001','su_success','2022-01-02 08:15:00'),
+('r05','c001','su_success','2022-01-02 08:15:00');
+
+insert into trip_details values
+('t01','cl12','r01','c001',4.9,4.5,'2022-01-02 09:00:00','2022-01-02 09:10:00','2022-01-02 09:08:00','completed'),
+('t02','cl10','r01','c001',4.9,4.8,'2022-01-02 11:00:00','2022-01-02 11:10:00','2022-01-02 11:13:00','completed'),
+('t03','cl09','r04','c001',4.9,4.8,'2022-01-03 11:00:00','2022-01-03 11:10:00','2022-01-03 11:13:00','completed');
+
+with signup_completed_cte as (
+select s.city_id, cast(s.timestamp as date) date, count(1) signups, count(distinct case when t.request_at between (s.timestamp and date_add(s.timestamp, interval 168 HOUR)) and t.status='completed'
+then t.driver_id end) completed_trips from signup_events s inner join trip_details t on s.rider_id=t.driver_id where (s.event_name='attempted_su' or s.event_name='su_success') and
+cast(s.timestamp as date) between '2022-01-01' and '2022-01-07' group by s.city_id, cast(s.timestamp as date)
+)
+
+select city_id, date, concat(cast(completed_trips*100/signups as DECIMAL(15,2)),'%') from signup_completed_cte
