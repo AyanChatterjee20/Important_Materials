@@ -7,6 +7,8 @@ data = data.groupBy('key').pivot('val').agg(count('val'))
 data.show()
 data = data.na.fill(0)
 data.show()
+
+spark.sql("select substr(date_trunc('month',current_date()),1,10) as date").show()
 -----------------------------------------------------------------------------------------
 from pyspark.sql import Row
 from pyspark.sql.types import StructType, StructField, IntegerType, StringType, DoubleType

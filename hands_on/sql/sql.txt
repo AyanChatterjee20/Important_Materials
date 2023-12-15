@@ -110,3 +110,79 @@ cast(s.timestamp as date) between '2022-01-01' and '2022-01-07' group by s.city_
 )
 
 select city_id, date, concat(cast(completed_trips*100/signups as DECIMAL(15,2)),'%') from signup_completed_cte
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------
+Find all the users who were active for 3 consecutive days or more
+
+create table sf_events(
+date datetime,
+acount_id varchar(100),
+user_id varchar(100));
+
+insert into sf_events values
+('2021-01-01','A1','U1'),
+('2021-01-01','A1','U2'),
+('2021-01-06','A1','U3'),
+('2021-01-02','A1','U1'),
+('2020-12-24','A1','U2'),
+('2020-12-08','A1','U1'),
+('2020-12-09','A1','U1'),
+('2021-01-10','A2','U4'),
+('2021-01-11','A2','U4'),
+('2021-01-12','A2','U4'),
+('2021-01-15','A2','U5'),
+('2020-12-17','A2','U4'),
+('2020-12-25','A3','U6'),
+('2020-12-25','A3','U6'),
+('2020-12-25','A3','U6'),
+('2020-12-06','A3','U7'),
+('2020-12-06','A3','U6'),
+('2021-01-14','A3','U6'),
+('2021-02-07','A1','U1'),
+('2021-02-10','A1','U2'),
+('2021-02-01','A2','U4'),
+('2021-02-01','A2','U5'),
+('2020-12-05','A1','U8');
+
+with rn_cte as(
+select user_id, date, ROW_NUMBER() over(PARTITION by user_id order by date) rn from sf_events
+)
+
+select user_id from rn_cte group by user_id, date_add(date, interval -rn day) having count(date_add(date, interval -rn day)) >=3
+
+-----------------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
