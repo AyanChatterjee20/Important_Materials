@@ -324,21 +324,62 @@ insert into user_streaks values
 
 select date_visited, count(distinct(user_id)) no_of_user from user_streaks group by date_visited order by no_of_user desc limit 2
 
+---------------------------------------------------------------------------------------------------------------------------------------------
+Find the latest inspection date for the most sanitary restaurant(s). Assume the most sanitary restaurant is the one with the highest number of points received in any inspection (not just the last one). Only businesses with 'restaurant' in the name should be considered in your analysis. Output the corresponding facility name, inspection score, latest inspection date, previous inspection date, and the difference between the latest and previous inspection dates. And order the records based on the latest inspection date in ascending order.
 
+create table los_angeles_restaurant_health_inspectin (
+serial_number varchar(100),
+activity_date datetime,
+facility_name varchar(100),
+score int,
+grade varchar(100),
+service_code int,
+service_description varchar(100),
+employee_id varchar(100),
+facility_address varchar(100),
+facility_city varchar(100),
+facility_id varchar(100),
+facility_state varchar(100),
+facility_zip varchar(100),
+owner_id varchar(100),
+owner_name varchar(100),
+pe_description varchar(100),
+program_element_pe int,
+program_name varchar(100),
+program_status varchar(100),
+record_id varchar(100));
 
+select r1.facility_name, r1.score, max(r1.activity_date) latest_inspection_date, max(r2.activity_date) previous_inspection_date, datediff(max(r1.activity_date),max(r2.activity_date)) difference 
+from los_angeles_restaurant_health_inspectin r1 left join los_angeles_restaurant_health_inspectin r2 on r1.facility_name = r2.facility_name and r1.activity_date > r2.activity_date 
+where r1.facility_name like '%resturant%' and r1.score in (select max(score) from los_angeles_restaurant_health_inspectin) 
+group by r1.facility_name, r1.score order by latest_inspection_date
 
+------------------------------------------------------------------------------------------------------------------------------------------------------
+You’re given a dataset of uber rides with the traveling distance (‘distance_to_travel’) and cost (‘monetary_cost’) for each ride. For each date, find the difference between the distance per-dollar for that date and the average distance-per-dollar for that year-month. Distance-per-dollar is defined as the distance traveled divided by the cost of the ride. The output should include the year-month (YYYY-MM) and the absolute average difference in distance-per-dollar (Absolute value to be rounded to the 2nd decimal). You should also count both success and failed request_status as the distance and cost values are populated for all ride requests. Also, assume that all dates are unique in the dataset. Order your results by earliest request date first.
 
+create table uber_request_logs (
+request_id int,
+request_date date,
+request_status varchar(50),
+distance_to_travel float,
+monetary_cost float,
+driver_to_client_distance float);
 
+insert into uber_request_logs values 
+(1,'2020-01-09','success',70.59,6.56,14.36),
+(2,'2020-01-24','success',93.36,22.68,19.9),
+(3,'2020-02-08','fail',51.24,11.39,21.32),
+(4,'2020-02-23','success',61.58,8.04,44.26),
+(5,'2020-03-09','success',25.04,7.19,1.74),
+(6,'2020-03-24','fail',45.57,4.68,24.19),
+(7,'2020-04-08','success',24.45,12.69,15.91),
+(8,'2020-04-23','success',48.22,11.2,48.82),
+(9,'2020-05-08','success',56.63,4.04,16.08);
 
+with distance_cte as (
+select date_format(request_date , '%m-%Y') date, request_status, distance_to_travel/monetary_cost distance_per_dollar, avg(distance_to_travel/monetary_cost) over(partition by date_format(request_date , '%m-%Y')) as avg_distance_per_dollar from uber_request_logs)
 
-
-
-
-
-
-
-
-
+select date, abs(distance_per_dollar - avg_distance_per_dollar)  difference, sum(case when request_status='success' then 1 else 0 end) count_sum, sum(case when request_status='fail' then 1 else 0 end) from distance_cte group by date, abs(distance_per_dollar - avg_distance_per_dollar) order by date 
 
 
 
