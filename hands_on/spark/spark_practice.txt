@@ -1,15 +1,3 @@
-cMap = {"k1" : "v1", "k2" : "v1", "k3" : "v2", "k4" : "v2"}
-a_cMap = [(k,)+(v,) for k,v in cMap.items()] 
-data = spark.createDataFrame(a_cMap, ['key','val'])
-data.show()
-from pyspark.sql.functions import count
-data = data.groupBy('key').pivot('val').agg(count('val'))
-data.show()
-data = data.na.fill(0)
-data.show()
-
-spark.sql("select substr(date_trunc('month',current_date()),1,10) as date").show()
------------------------------------------------------------------------------------------
 from pyspark.sql import Row
 from pyspark.sql.types import StructType, StructField, IntegerType, StringType, DoubleType
 from pyspark.sql.functions import *
@@ -103,30 +91,3 @@ df=df.withColumn("words",explode(split(col("sen"),' ')))
 df=df.groupBy(col("words")).agg(count(col("words")).alias("word_count"))
 df.show()
 ----------------------------------------------------------------------------------------------------------
-Given a DataFrame containing product information with amounts and countries, the task is to create a concise summary table where each row represents a unique product, and the columns show the amounts associated with that product in different countries. If a product is not available in a specific country, the value in that cell should be null.
-
-Problem:
-------------------------------------------------------
-| Product | Amount | Country |
-|---------|--------|---------|
-| Banana | 1000  | USA   |
-| Carrots | 1500  | USA   |
-| Banana | 400  | China  |
-
-Output:
---------------------------------
-| product | China | USA  |
-|---------|-------|--------|
-| Banana | 400  | 1000  |
-| Carrots | null | 1500  |
-
-data=[['Banana',1000,'USA'],['Carrots',1500,'USA'],['Banana',400,'China']]
-df=spark.createDataFrame(data,['product','amount','country'])
-
-df=df.groupBy(col("product")).pivot("country").agg(sum(col("amount")))
-df.show()
-
-
-
-
-
