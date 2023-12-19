@@ -7,13 +7,13 @@ data = data.groupBy('key').pivot('val').agg(count('val'))
 data.show()
 data = data.na.fill(0)
 data.show()
-
+--------------------------------------------------------------------------------------------------------
 spark.sql("select substr(date_trunc('month',current_date()),1,10) as date").show()
 ----------------------------------------------------------------------------------------------------------
 Given a DataFrame containing product information with amounts and countries, the task is to create a concise summary table where each row represents a unique product, and the columns show the amounts associated with that product in different countries. If a product is not available in a specific country, the value in that cell should be null.
 
 Problem:
-------------------------------------------------------
+------------------------------
 | Product | Amount | Country |
 |---------|--------|---------|
 | Banana | 1000  | USA   |
@@ -21,7 +21,7 @@ Problem:
 | Banana | 400  | China  |
 
 Output:
---------------------------------
+---------------------------
 | product | China | USA  |
 |---------|-------|--------|
 | Banana | 400  | 1000  |
@@ -32,6 +32,73 @@ df=spark.createDataFrame(data,['product','amount','country'])
 
 df=df.groupBy(col("product")).pivot("country").agg(sum(col("amount")))
 df.show()
+----------------------------------------------------------------------------------------------------------------------
+Given two input files:
+- employee.csv with columns: employee_id, department, salary
+- employee_personal.csv with columns: employee_id, first_name, last_name, DOB, state, country
+
+Write PySpark transformations to create `employee_fact` with columns: employee_id, employee_full_name, department, salary, Salary_Diff_to_reach_highest_sal, DOB, state, country, age
+
+df_e = spark.read.format("csv").option("header", "true").load("\\Users\\AYAN\\Desktop\\sample_input_files\\employee.csv")
+df_p = spark.read.format("csv").option("header", "true").load("\\Users\\AYAN\\Desktop\\sample_input_files\\employee_personal.csv")
+from pyspark.sql.functions import *
+from pyspark.sql.window import Window
+
+df=df_p.join(df_e,'employee_id',how='inner')
+df=df.withColumn("employee_full_name",concat(col("first_name"),lit(" "),col("last_name"))).drop("first_name","last_name")
+w=Window.partitionBy(col("department")).orderBy(col("salary")).rangeBetween(Window.unboundedPreceding, Window.unboundedFollowing)
+df=df.withColumn("salary_diff_to_reach_highest_sal",max(col("salary")).over(w)-col("salary"))
+df.show()
+
+-----------------------------------------------------------------------------------------------------------------------------------
+revenue date 
+3000   22-may 
+5000   23-may 
+5000   25-may 
+10000  22-june 
+12500   03-july 
+
+How would you calculate the month-wise cumulative revenue using PySpark?
+
+data=[[3000,'22-may'],[5000,'23-may'],[5000,'25-may'],[10000,'22-june'],[12500,'03-july']]
+df=spark.createDataFrame(data,['revenue','date'])
+
+df=df.withColumn("month",split(col("date"),'-')[1]).withColumn("date",date_format(to_date(col("date"),"dd-MMMM"),"dd-MM"))
+
+w=Window.partitionBy("month").orderBy("date")
+df=df.withColumn("cum_sum",sum("revenue").over(w))
+df.show()
+----------------------------------------------------------------------------------------------------------------------------------
+Name~|Age
+Brayan,gomez~|25
+John,Cleark~|30
+Sumit,Sen~|31
+
+read and show multi-delimeter sample.csv file 
+
+df = spark.read.format("text").load("\\Users\\AYAN\\Desktop\\sample_input_files\\sample.csv")
+header=df.first()[0]
+schema=header.split("~|")
+df=df.filter(col("value")!=header)
+df=df.rdd.map(lambda x: x[0].split("~|")).toDF(schema)
+df.show()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
