@@ -36,7 +36,7 @@ df_d.show()
 ----------------------------------------------------------------------------------------------
 Filter the DataFrame to keep only employees aged 30 or above and working in the "Sales" department
 
-df_s=df.filter((col("age")>=30) & (col("department")==lit("Sales")))
+df_s=df.filter((col("age")>=lit(30)) & (col("department")==lit("Sales")))
 df_s.show()
 ---------------------------------------------------------------------------------------------
 Calculate the difference between each employee's salary and the average salary of their respective department

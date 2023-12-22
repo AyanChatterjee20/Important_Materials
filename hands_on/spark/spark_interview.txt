@@ -82,7 +82,7 @@ schema=header.split("~|")
 df=df.filter(col("value")!=header)
 df=df.rdd.map(lambda x: x[0].split("~|")).toDF(schema)
 df.show()
-
+------------------------------------------------------------------------------------------------------------------------------
 
 
 
