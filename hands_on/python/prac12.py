@@ -4,7 +4,7 @@
 
 def create_dict(val):
     l = list(val)
-    print(l)
+    # print(l)
     d = {key: ord(key) for key in l}
     return d
 
