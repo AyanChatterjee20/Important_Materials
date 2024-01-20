@@ -200,8 +200,12 @@ df=spark.createDataFrame([['A1','ADULT',54],['A2','ADULT',53],['A3','ADULT',52],
 
 
 ---------------------------------------------------------------------------------------------------------------------------------------------
-a=spark.createDataFrame([[1,'Ayan'],[1,'Abir']],schema=['id', 'name'])
-b=spark.createDataFrame([[1,'Chatterjee'],[0,'Das']],schema=['id', 'surname'])
+a=spark.createDataFrame([[1,'Ayan'],[1,'Abir']],schema=['id', 'name1'])
+b=spark.createDataFrame([[1,'Ayan'],[0,'Rimpa']],schema=['id', 'name2'])
+
+a=spark.createDataFrame([[1],[1]],schema=['id'])
+b=spark.createDataFrame([[1],[0]],schema=['id'])
+
 
 Calculate no or rows for each scenario:
 Table A INNER JOIN TABLE B = ? 2
