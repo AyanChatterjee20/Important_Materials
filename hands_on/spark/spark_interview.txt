@@ -199,14 +199,32 @@ Expected Output:--->
 df=spark.createDataFrame([['A1','ADULT',54],['A2','ADULT',53],['A3','ADULT',52],['A4','ADULT',58],['A5','ADULT',54],['C1','CHILD',20],['C2','CHILD',19],['C3','CHILD',22],['C4','CHILD',15]],schema=['person','type','age'])
 
 
+---------------------------------------------------------------------------------------------------------------------------------------------
+a=spark.createDataFrame([[1,'Ayan'],[1,'Abir']],schema=['id', 'name'])
+b=spark.createDataFrame([[1,'Chatterjee'],[0,'Das']],schema=['id', 'surname'])
 
+Calculate no or rows for each scenario:
+Table A INNER JOIN TABLE B = ? 2
+Table A LEFT JOIN TABLE B = ?2[1,1][1,1]
+Table A RIGHT JOIN TABLE B = ?3
+Table A OUTER JOIN TABLE B = ?4 [1,1][1,0][1,1][1,0]
+Table A UNION TABLE B = ?2
+Table A UNION ALL TABLE B = ?3
 
+a_inner_b=a.join(b,['id'],'inner')
+a_inner_b.show()
 
+a_left_b=a.join(b,['id'],'left')
+a_left_b.show()
 
+a_right_b=a.join(b,['id'],'right')
+a_right_b.show()
 
+a_outer_b=a.join(b,['id'],'outer')
+a_outer_b.show()
 
+a_union_b=a.union(b)
+a_union_b.show()
 
-
-
-
-
+a_unionall_b=a.unionAll(b)
+a_unionall_b.show()
