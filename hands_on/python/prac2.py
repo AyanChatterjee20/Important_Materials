@@ -14,7 +14,7 @@ def palindrome_check(val):
 
 def prime_check(val):
     l = []
-    for val1 in range(2, val + 1):
+    for val1 in range(3, val + 1):
         for i in range(2, m.floor(val1 / 2)):
             if val1 % i == 0:
                 break
