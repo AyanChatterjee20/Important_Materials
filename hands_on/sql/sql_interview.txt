@@ -215,8 +215,44 @@ insert into adult_child values
 ('C3','CHILD',22),
 ('C4','CHILD',15);
 ------------------------------------------------------------------------------------------------------------------------
+Calculate no or rows for each scenario:
+Table A INNER JOIN TABLE B = ? 2
+Table A LEFT JOIN TABLE B = ?2[1,1][1,1]
+Table A RIGHT JOIN TABLE B = ?3
+Table A OUTER JOIN TABLE B = ?4 [1,1][1,0][1,1][1,0]
+Table A UNION TABLE B = ?2
+Table A UNION ALL TABLE B = ?3
 
+create table a (
+id int,
+name varchar(20));
 
+create table b (
+id int,
+surname varchar(20));
 
+insert into a values 
+(1,'Ayan'),
+(1,'Abir');
 
+insert into b values 
+(1,'Chatterjee'),
+(0, 'Das');
+
+select a.id,name,surname from a inner join b on a.id=b.id
+
+select a.id,name,surname from a left join b on a.id=b.id
+
+select b.id,name,surname from a right join b on a.id=b.id
+
+select b.id,name,surname from a cross join b
+
+select * from a 
+UNION
+select * from b 
+
+select * from a 
+UNIONALL
+select * from b 
+----------------------------------------------------------------------------------------------------------
 

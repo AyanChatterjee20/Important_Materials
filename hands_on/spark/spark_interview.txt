@@ -211,8 +211,8 @@ df_c=df_c.withColumn("id",row_number().over(w2)).withColumnRenamed("person","chi
 df=df_a.join(df_c,'id','left').select("adult","child")
 df.show()
 ---------------------------------------------------------------------------------------------------------------------------------------------
-a=spark.createDataFrame([[1,'Ayan'],[1,'Abir']],schema=['id', 'name1'])
-b=spark.createDataFrame([[1,'Ayan'],[0,'Rimpa']],schema=['id', 'name2'])
+a=spark.createDataFrame([[1,'Ayan'],[1,'Abir']],schema=['id', 'name'])
+b=spark.createDataFrame([[1,'Chatterjee'],[0,'DAS']],schema=['id', 'surname'])
 
 a=spark.createDataFrame([[1],[1]],schema=['id'])
 b=spark.createDataFrame([[1],[0]],schema=['id'])
@@ -235,7 +235,9 @@ a_left_b.show()
 a_right_b=a.join(b,['id'],'right')
 a_right_b.show()
 
-a_outer_b=a.join(b,['id'],'outer')
+a=spark.createDataFrame([[1,'Ayan'],[1,'Abir']],schema=['id_a', 'name'])
+b=spark.createDataFrame([[1,'Chatterjee'],[0,'DAS']],schema=['id_b', 'surname'])
+a_outer_b=a.crossJoin(b)
 a_outer_b.show()
 
 a_union_b=a.union(b)
