@@ -73,7 +73,15 @@ Result Table:
 | 40   | Chicago FC | 0     |
 
 Ans:
-select team_id,team_name,num_points from (select team_id,team_name,sum(case when host_goals > guest_goals then 3 when host_goals = guest_goals then 1 when host_goals < guest_goals then 0 end) num_points from teams t inner join matches on team_id=host_team group by team_id,team_name) as d order by num_points desc , team_id
+with host as (
+select team_id,team_name,host_points from (select team_id,team_name,sum(case when host_goals > guest_goals then 3 when host_goals = guest_goals then 1 when host_goals < guest_goals then 0 end) host_points from teams t inner join matches on team_id=host_team group by team_id,team_name) as d order by host_points desc , team_id
+),
+
+guest as (
+select team_id,team_name,guest_points from (select team_id,team_name,sum(case when host_goals < guest_goals then 3 when host_goals = guest_goals then 1 when host_goals > guest_goals then 0 end) guest_points from teams t inner join matches on team_id=guest_team group by team_id,team_name) as d order by guest_points desc , team_id
+)
+
+select t.team_id,t.team_name,(host_points+guest_points) as num_points from teams t left join host h on h.team_id=t.team_id left join guest g on t.team_id=g.team_id
 
 
 create table teams (

@@ -91,3 +91,59 @@ df=df.withColumn("words",explode(split(col("sen"),' ')))
 df=df.groupBy(col("words")).agg(count(col("words")).alias("word_count"))
 df.show()
 ----------------------------------------------------------------------------------------------------------
+arrayArrayData = [("Abhishek", [["Java", "scala", "perl"], ["spark","java"]]), ("Nitya", [["spark", "java", "c++"], ["spark", "java"]]), ("Sandeep", [["csharp", "vb"], ["spark", "python"]])]
+df = spark.createDataFrame(data = arrayArrayData, schema = ['name', 'subjects'])
+
+df.printSchema()
+df.show(truncate=False)
+from pyspark.sql.functions import explode, flatten
+
+df.select(df.name, explode(df.subjects)).show(truncate=False)
+df.select(df.name, flatten(df.subjects)).show(truncate=False)
+
+df=df.select(df.name, flatten(df.subjects).alias("flatten"))
+df.select(df.name, explode(df.flatten)).show(truncate=False)
+----------------------------------------------------------------------------------------------------------------
+df = spark.createDataFrame([["1", "2019-07-01 12:01:19.000"], ["2", "2019-06-24 12:01:19.000"]], ["id", "input_timestamp"])
+
+df.printSchema()
+df.show()
+
+df = df.withColumn("timestamptype", to_timestamp("input_timestamp"))
+df = df.select(col("id"),"timestamptype","input_timestamp", to_date(col("input_timestamp")).alias("date"))
+df.show()
+----------------------------------------------------------------------------------------------------------------
+sampleData = (("Ram", "Sales", 3000), ("Meena", "Sales", 4600), ("Abhishek", "Sales", 4100), ("Kunal", "Finance", 3000), ("Ram", "Sales", 3000), ("Srishti", "Management", 3300), ("Sandeep", "Finance", 3900), ("Hitesh", "Marketing", 3000), ("Kailash", "Marketing", 2000), ("Shyam", "Sales", 4100) )
+columns = ["Employee_Name", "Department", "Salary"]
+df = spark.createDataFrame(data=sampleData,schema=columns)
+
+df.printSchema()
+df.show()
+
+windowPartitionAgg = Window.partitionBy("Department")
+w = Window.partitionBy("Department").orderBy("salary").rangeBetween(Window.currentRow, Window.unboundedFollowing)
+df=df.withColumn("Avg",avg(col("salary")).over(windowPartitionAgg)).withColumn("Sum",sum(col("salary")).over(windowPartitionAgg)).withColumn("Min",min(col("salary")).over(windowPartitionAgg)).withColumn("Max",max(col("salary")).over(windowPartitionAgg)).withColumn("cum_sum",sum("salary").over(w))
+df.show()
+
+
+sampleData = ((101, "Ram", "Biology", 80), (103, "Sita", "Social Science", 78), (104, "Lakshman", "Sanskrit", 58), (102, "Kunal", "Phisycs", 89), (101, "Ram", "Biology", 80), (106, "Srishti", "Maths", 70), (108, "Sandeep", "Physics", 75), (107, "Hitesh", "Maths", 88), (109, "Kailash", "Maths", 90), (105, "Abhishek", "Social Science", 84) )
+columns = ["Roll_No", "Student_Name", "Subject", "Marks"]
+df2 = spark.createDataFrame(data=sampleData, schema=columns)
+windowPartition = Window.partitionBy("Subject").orderBy("Marks")
+df2.printSchema()
+df2.show()
+
+
+sampleData = ((101, "Ram", "Biology", 80), (103, "Sita", "Social Science", 78), (104, "Lakshman", "Sanskrit", 58), (102, "Kunal", "Physics", 89), (101, "Ram", "Biology", 80), (106, "Srishti", "Maths", 70), (108, "Sandeep", "Physics", 75), (107, "Hitesh", "Maths", 88), (109, "Kailash", "Maths", 90), (105, "Abhishek", "Social Science", 84) )
+columns = ["Roll_No", "Student_Name", "Subject", "Marks"]
+df = spark.createDataFrame(data=sampleData, schema=columns)
+
+windowPartition = Window.partitionBy("Subject").orderBy("Marks")
+df.printSchema()
+df.show()
+
+df=df.withColumn("row_number", row_number().over(windowPartition)).withColumn("rank", rank().over(windowPartition)).withColumn("dense_rank", dense_rank().over(windowPartition)).withColumn("lead", lead("Marks",1).over(windowPartition)).withColumn("lag", lag("Marks",1).over(windowPartition))
+df.printSchema()
+df.show()
+-------------------------------------------------------------------------------------------------------------------------------------
+
