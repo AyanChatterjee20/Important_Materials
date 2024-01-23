@@ -197,8 +197,19 @@ Expected Output:--->
 | A3 | NULL |
 
 df=spark.createDataFrame([['A1','ADULT',54],['A2','ADULT',53],['A3','ADULT',52],['A4','ADULT',58],['A5','ADULT',54],['C1','CHILD',20],['C2','CHILD',19],['C3','CHILD',22],['C4','CHILD',15]],schema=['person','type','age'])
+from pyspark.sql.functions import *
+from pyspark.sql.window import Window
+df_a=df.filter(col("type")=='ADULT')
+df_c=df.filter(col("type")=='CHILD')
 
+w1=Window.orderBy(desc(col("age")))
+w2=Window.orderBy(col("age"))
 
+df_a=df_a.withColumn("id",row_number().over(w1)).withColumnRenamed("person","adult")
+df_c=df_c.withColumn("id",row_number().over(w2)).withColumnRenamed("person","child")
+
+df=df_a.join(df_c,'id','left').select("adult","child")
+df.show()
 ---------------------------------------------------------------------------------------------------------------------------------------------
 a=spark.createDataFrame([[1,'Ayan'],[1,'Abir']],schema=['id', 'name1'])
 b=spark.createDataFrame([[1,'Ayan'],[0,'Rimpa']],schema=['id', 'name2'])
