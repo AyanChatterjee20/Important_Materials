@@ -255,4 +255,38 @@ select * from a
 UNIONALL
 select * from b 
 ----------------------------------------------------------------------------------------------------------
+Write an SQL query to find all numbers that appear at least three times consecutively.
+Logs table:
++----+-----+
+| id | num |  
++----+-----+ 
+| 1  | 1   | 
+| 2  | 1   | 
+| 3  | 1   | 
+| 4  | 2   | 
+| 5  | 1   | 
+| 6  | 2   | 
+| 7  | 2   | 
+
+create table el (
+id int,
+num int);
+
+insert into el values 
+(1,1),
+(2,1),
+(3,1),
+(4,2),
+(5,1),
+(6,2),
+(7,2);
+
+with cte as(
+select id,num, row_number() over(partition by num order by id) rw from el ),
+
+cte2 as (
+select num,tmp,count(*) cnt from (select num, (id-rw) as tmp from cte) as c group by num,tmp)
+
+select num from cte2 where tmp=0 and cnt>=3
+-------------------------------------------------------------------------------------------------------------
 

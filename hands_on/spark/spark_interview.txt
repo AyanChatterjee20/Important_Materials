@@ -214,9 +214,18 @@ df.show()
 a=spark.createDataFrame([[1,'Ayan'],[1,'Abir']],schema=['id', 'name'])
 b=spark.createDataFrame([[1,'Chatterjee'],[0,'DAS']],schema=['id', 'surname'])
 
-a=spark.createDataFrame([[1],[1]],schema=['id'])
-b=spark.createDataFrame([[1],[0]],schema=['id'])
+a=spark.createDataFrame([[1],[1],[2]],schema=['id'])
+b=spark.createDataFrame([[1],[2],[2],[0]],schema=['id'])
 
+from pyspark.sql.types import StringType
+from pyspark.sql.functions import lit
+
+c = a.withColumn('id', lit(None).cast(StringType()))
+c=c.limit(2)
+a=a.union(c)
+
+c=c.limit(1)
+b=b.union(c)
 
 Calculate no or rows for each scenario:
 Table A INNER JOIN TABLE B = ? 2
@@ -235,13 +244,18 @@ a_left_b.show()
 a_right_b=a.join(b,['id'],'right')
 a_right_b.show()
 
-a=spark.createDataFrame([[1,'Ayan'],[1,'Abir']],schema=['id_a', 'name'])
-b=spark.createDataFrame([[1,'Chatterjee'],[0,'DAS']],schema=['id_b', 'surname'])
 a_outer_b=a.crossJoin(b)
 a_outer_b.show()
+
+b_anti_a=b.join(a,['id'],'left_anti')
+b_anti_a.show()
+
+b_semi_a=b.join(a,['id'],'left_semi')
+b_semi_a.show()
 
 a_union_b=a.union(b)
 a_union_b.show()
 
 a_unionall_b=a.unionAll(b)
 a_unionall_b.show()
+-----------------------------------------------------------------------------------------------------
