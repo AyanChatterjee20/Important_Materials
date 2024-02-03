@@ -259,3 +259,36 @@ a_union_b.show()
 a_unionall_b=a.unionAll(b)
 a_unionall_b.show()
 -----------------------------------------------------------------------------------------------------
+| id|      date       |value|
+| P1|2016-10-01|  100|
+| P1|2016-10-02|  200|
+| P1|2016-10-16|  200|
+| P2|2016-10-09|  200|
+ 
+| id|        start_date             |  end_date                                
+| P1|2016-10-01 18:00:00  |  2016-10-03 10:00:00
+ 
+ID | Date |Value | Failure_Indicator
+ ------------------------------------------------- 
+P1 | 2016-10-01 |100 | 1 
+P1 | 2016-10-02 |200 | 1 
+P1 | 2016-10-16 |700 | 0 
+P2 | 2016-10-09 |700 | 0
+
+df1=spark.createDataFrame([['p1','2016-10-01','100'],['p1','2016-10-02','200'],['p1','2016-10-16','200'],['p2','2016-10-09','200']],schema=['id','date','value'])
+df2=spark.createDataFrame([['p1','2016-10-01 18:00:00','2016-10-03 10:00:00']],schema=['id','start_date','end_date'])
+
+from pyspark.sql.functions import *
+
+df=df1.join(df2,['id'],'left_outer')
+df=df.withColumn('start_date',when(col("start_date").isNotNull(), split(col("start_date"),' ')[0])).withColumn('end_date',when(col("end_date").isNotNull(), split(col("end_date"),' ')[0]))
+
+df=df.withColumn('date',to_date(col("date"),'yyyy-mm-dd')).withColumn('start_date',to_date(col("start_date"),'yyyy-mm-dd')).withColumn('end_date',to_date(col("end_date"),'yyyy-mm-dd'))
+df=df.withColumn('failure_indicator',when(col("date").between(col("start_date"),col("end_date")),lit(1)).otherwise(lit(0))).drop('start_date','end_date')
+
+df.show()
+---------------------------------------------------------------------------------------------------------------
+
+
+
+

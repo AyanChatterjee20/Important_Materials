@@ -289,4 +289,44 @@ select num,tmp,count(*) cnt from (select num, (id-rw) as tmp from cte) as c grou
 
 select num from cte2 where tmp=0 and cnt>=3
 -------------------------------------------------------------------------------------------------------------
+I/p
+Customer_id , Account_id, Account_type
+Cust_id_1,  accnt_id_1, loan_account
+Cust_id_1,  accnt_id_2, savings_account
+Cust_id_1,  accnt_id_3, demat_account
+Cust_id_2,  accnt_id_4, loan_account
+Cust_id_2,  accnt_id_5, loan_account
+Cust_id_2,  accnt_id_6, savings_account
+Cust_id_3,  accnt_id_7, demat_account
+ 
+o/p
+Cust_id , has_demat_account
+ 
+Cust_id_1, 1
+Cust_id_2, 0
+Cust_id_3 ,1 
+
+
+select customer_id,  1 as has_demat_account  from bank_customer where customer_id in (select distinct(customer_id) from bank_customer where account_type="demat_account")
+union
+select customer_id,  0 as has_demat_account  from bank_customer where customer_id not in (select distinct(customer_id) from bank_customer where account_type="demat_account")
+
+
+create table bank_customer (
+customer_id varchar(20),
+account_id varchar(20),
+account_type varchar(20)
+);
+
+insert into bank_customer values
+('Cust_id_1','accnt_id_1','loan_account'),
+('Cust_id_1','accnt_id_2','savings_account'),
+('Cust_id_1','accnt_id_3','demat_account'),
+('Cust_id_2','accnt_id_4','loan_account'),
+('Cust_id_2','accnt_id_5','loan_account'),
+('Cust_id_2','accnt_id_6','savings_account'),
+('Cust_id_3','accnt_id_7','demat_account');
+----------------------------------------------------------------------------------------------------------------------------------
+
+
 
