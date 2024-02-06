@@ -17,7 +17,11 @@ insert into players values
 (3,1,'2016-03-02',0),
 (3,4,'2018-07-03',5);
 
-select player_id, lead() over(partition by player_id order by event_date) lead_day, lag() over(partition by player_id order by event_date) lag_day from players; 
+with cte as (
+select e.player_id from players e join players e1 on e.player_id=e1.player_id and datediff(e.event_date, e1.event_date) =1
+)
+
+select concat(round((count(distinct c.player_id)/count(distinct p.player_id)),2),'%') player_perc from players p left join cte c on p.player_id=c.player_id
 -----------------------------------------------------------------------------------------------------------------------------------------------------
 1. **Teams**
  - `team_id` (int, primary key): Unique identifier for each football team.
