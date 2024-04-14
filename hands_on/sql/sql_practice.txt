@@ -64,7 +64,7 @@ with cmt_cte as (
 select u.id, count(1) no_of_comment from fb_users u inner join fb_comments c on u.id=c.user_id 
 where YEAR(u.joined_at) between 2018 and 2020 and date_format(cast(c.created_at as date), '%m-%Y') = '01-2020' and u.joined_at <= c.created_at
 group by u.id
-);
+)
 
 select no_of_comment, count(id) no_of_users from cmt_cte group by no_of_comment order by no_of_users
 
