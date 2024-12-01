@@ -1,7 +1,7 @@
 # Print a string in reverse and space in between each character
 
 def reverse(val: str, l: int):
-    val = list(val)
+    # val = list(val)
     temp = []
     for i in range(l):
         t = val[l - 1 - i]

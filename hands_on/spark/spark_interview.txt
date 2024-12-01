@@ -152,7 +152,7 @@ pp=spark.createDataFrame([[2,'100/kg','2023-01-01'],[2,'110/kg','2023-02-01'],[2
 o=spark.createDataFrame([[1,2,'2023-02-15','5 kg']],schema=['order_id','product_id','date_sold','unit_sold'])
 
 from pyspark.sql.types import IntegerType
-from pypsark.sql.functions import *
+from pyspark.sql.functions import *
 
 pp1=pp.withColumn("price",split(col("price"),'/')[0])
 pp1=pp1.withColumn("price",col("price").cast(IntegerType()))
@@ -161,9 +161,9 @@ o1=o.withColumn("unit_sold",split(col("unit_sold"),' ')[0]).withColumn("unit_sol
 
 pp2=pp1.withColumn("effective_date",to_date(col("effective_date"),'yyyy-mm-dd'))
 o2=o1.withColumn("date_sold",to_date(col("date_sold"),'yyyy-mm-dd'))
-df1=pp2.join(o2,['product_id'],'inner')
+df1=pp2.join(o2,['product_id'],'inner').withColumn("total_sum",col("price")*col("unit_sold"))
 df=df1.join(p,['product_id'],'inner')
-df2=df1.filter((col("date_sold")>col("effective_date")) & (col("order_id")==1)).orderBy(col("effective_date").desc()).limit(1)
+df2=df.filter((col("date_sold")>col("effective_date")) & (col("order_id")==1)).orderBy(col("effective_date").desc()).limit(1)
 df3=df2.select("product_name","total_sum")
 df3.show()
 --------------------------------------------------------------------------------------------------------------------------
@@ -243,6 +243,9 @@ a_left_b.show()
 
 a_right_b=a.join(b,['id'],'right')
 a_right_b.show()
+
+a_self_a=a.join(a,['id'])
+a_self_a.show()
 
 a_outer_b=a.crossJoin(b)
 a_outer_b.show()
