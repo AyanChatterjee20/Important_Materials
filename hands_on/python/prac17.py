@@ -4,7 +4,7 @@
 # Return the indexes in increasing order ([1,2] not [2,1])
 
 def check(l, t):
-    for i in range(len(l)):
+    for i in range(len(l-1)):
         for j in range(i + 1, len(l)):
             if (l[i] + l[j]) == t:
                 return [i, j]
